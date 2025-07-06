@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const API_BASE_URL = "https://your-api-url.com"; // Пока просто заглушка
+// const API_BASE_URL = "https://...";
 
 export default function TodoApp() {
   const [tasks, setTasks] = useState([]);
