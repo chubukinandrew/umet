@@ -5,7 +5,7 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors({
   origin: '*', // разрешаем запросы с любых источников (для теста)
