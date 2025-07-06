@@ -1,25 +1,25 @@
 // index.js
-console.log('RAILWAY ENV PORT:', process.env.PORT);
+console.log('RAILWAY ENV PORT:', process.env.PORT); // лог для дебага
+
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000; // Railway сам передаст PORT, иначе локально 5000
 
-app.use(cors({
-  origin: '*', // разрешаем запросы с любых источников (для теста)
-}));
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // для Railway/Heroku
+    rejectUnauthorized: false, // для Railway/PostgreSQL
   },
 });
 
+// GET /tasks
 app.get('/tasks', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM tasks ORDER BY id DESC');
@@ -30,6 +30,7 @@ app.get('/tasks', async (req, res) => {
   }
 });
 
+// POST /tasks
 app.post('/tasks', async (req, res) => {
   try {
     const { title } = req.body;
@@ -45,5 +46,5 @@ app.post('/tasks', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
