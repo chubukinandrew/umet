@@ -1,3 +1,4 @@
+// index.js
 console.log('Server PORT:', process.env.PORT);
 
 const express = require('express');
@@ -59,6 +60,30 @@ app.delete('/tasks/:id', async (req, res) => {
     res.json({ message: 'Task deleted', task: result.rows[0] });
   } catch (err) {
     console.error('Error deleting task:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Обновить название таски по ID
+app.patch('/tasks/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title } = req.body;
+
+    if (!title) return res.status(400).json({ error: 'Title is required' });
+
+    const result = await pool.query(
+      'UPDATE tasks SET title = $1 WHERE id = $2 RETURNING *',
+      [title, id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    res.json({ message: 'Task updated', task: result.rows[0] });
+  } catch (err) {
+    console.error('Error updating task:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
