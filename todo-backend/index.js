@@ -46,6 +46,23 @@ app.post('/tasks', async (req, res) => {
   }
 });
 
+// Удалить таску по ID
+app.delete('/tasks/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('DELETE FROM tasks WHERE id = $1 RETURNING *', [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    res.json({ message: 'Task deleted', task: result.rows[0] });
+  } catch (err) {
+    console.error('Error deleting task:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
