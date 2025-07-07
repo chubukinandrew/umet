@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-// const API_BASE_URL = "https://...";
+const API_BASE_URL = "https://umet.onrender.com";
 
 export default function TodoApp() {
   const [tasks, setTasks] = useState([]);
@@ -8,18 +8,16 @@ export default function TodoApp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Функция загрузки задач — сейчас моковые данные
+  // Получение задач с API
   const fetchTasks = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Здесь потом будет fetch с API
-      setTasks([
-        { id: 1, title: "Sample Task 1", completed: false },
-        { id: 2, title: "Sample Task 2", completed: true },
-      ]);
-    } catch {
-      setError("Failed to load tasks");
+      const res = await fetch(`${API_BASE_URL}/tasks`);
+      const data = await res.json();
+      setTasks(data);
+    } catch (err) {
+      setError("⚠️ Failed to load tasks");
     }
     setLoading(false);
   };
@@ -28,29 +26,34 @@ export default function TodoApp() {
     fetchTasks();
   }, []);
 
-  // Добавление задачи
+  // Добавление задачи в API
   const addTask = async () => {
     if (!input.trim()) return;
     setLoading(true);
     setError(null);
     try {
-      // Здесь будет POST запрос к API
-      const newTask = {
-        id: Date.now(),
-        title: input.trim(),
-        completed: false,
-      };
+      const res = await fetch(`${API_BASE_URL}/tasks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: input.trim() }),
+      });
+
+      if (!res.ok) throw new Error();
+
+      const newTask = await res.json();
       setTasks([...tasks, newTask]);
       setInput("");
-    } catch {
-      setError("Failed to add task");
+    } catch (err) {
+      setError("⚠️ Failed to add task");
     }
     setLoading(false);
   };
 
   return (
     <div style={{ maxWidth: 400, margin: "40px auto", fontFamily: "Arial" }}>
-      <h2>ToDo App with API hooks (MVP)</h2>
+      <h2>ToDo App (Connected to API)</h2>
       {error && <div style={{ color: "red" }}>{error}</div>}
       <input
         type="text"
@@ -69,7 +72,7 @@ export default function TodoApp() {
         <ul style={{ marginTop: 20 }}>
           {tasks.map((task) => (
             <li key={task.id} style={{ padding: "6px 0" }}>
-              {task.title} {task.completed ? "(done)" : ""}
+              {task.title}
             </li>
           ))}
         </ul>
