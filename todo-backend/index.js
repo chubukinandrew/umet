@@ -1,10 +1,9 @@
-// index.js
 console.log('Server PORT:', process.env.PORT);
 
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-require('dotenv').config(); // если используешь локально .env
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,9 +12,9 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // переменная окружения с твоей строкой подключения
+  connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // для хостингов типа Render, Heroku, Railway
+    rejectUnauthorized: false,
   },
 });
 
@@ -33,12 +32,12 @@ app.get('/tasks', async (req, res) => {
 // Создать новую таску
 app.post('/tasks', async (req, res) => {
   try {
-    const { title } = req.body;
+    const { title, priority = 'medium' } = req.body;
     if (!title) return res.status(400).json({ error: 'Title is required' });
 
     const result = await pool.query(
-      'INSERT INTO tasks (title) VALUES ($1) RETURNING *',
-      [title]
+      'INSERT INTO tasks (title, priority) VALUES ($1, $2) RETURNING *',
+      [title, priority]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -64,17 +63,32 @@ app.delete('/tasks/:id', async (req, res) => {
   }
 });
 
-// Обновить название таски по ID
+// Обновить таску по ID
 app.patch('/tasks/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const { title } = req.body;
+    const { title, priority } = req.body;
+    let updateFields = [];
+    let values = [];
+    let index = 1;
 
-    if (!title) return res.status(400).json({ error: 'Title is required' });
+    if (title) {
+      updateFields.push(`title = $${index++}`);
+      values.push(title);
+    }
+    if (priority) {
+      updateFields.push(`priority = $${index++}`);
+      values.push(priority);
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
+    }
+
+    values.push(req.params.id);
 
     const result = await pool.query(
-      'UPDATE tasks SET title = $1 WHERE id = $2 RETURNING *',
-      [title, id]
+      `UPDATE tasks SET ${updateFields.join(', ')} WHERE id = $${index} RETURNING *`,
+      values
     );
 
     if (result.rowCount === 0) {
