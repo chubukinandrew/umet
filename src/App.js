@@ -5,6 +5,8 @@ const API_BASE_URL = "https://umet.onrender.com";
 export default function TodoApp() {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
+  const [editId, setEditId] = useState(null);
+  const [editText, setEditText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
@@ -29,21 +31,54 @@ export default function TodoApp() {
   const addTask = async () => {
     if (!input.trim()) return;
     setLoading(true);
-    setError(null);
     try {
       const res = await fetch(`${API_BASE_URL}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: input.trim() }),
       });
-
-      if (!res.ok) throw new Error();
-
       const newTask = await res.json();
       setTasks((prev) => [...prev, newTask]);
       setInput("");
     } catch {
       setError("⚠️ Failed to add task");
+    }
+    setLoading(false);
+  };
+
+  const deleteTask = async (id) => {
+    setLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}/tasks/${id}`, { method: "DELETE" });
+      setTasks((prev) => prev.filter((task) => task.id !== id));
+    } catch {
+      setError("⚠️ Failed to delete task");
+    }
+    setLoading(false);
+  };
+
+  const startEdit = (task) => {
+    setEditId(task.id);
+    setEditText(task.title);
+  };
+
+  const updateTask = async () => {
+    if (!editText.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/tasks/${editId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: editText.trim() }),
+      });
+      const updated = await res.json();
+      setTasks((prev) =>
+        prev.map((task) => (task.id === editId ? updated.task : task))
+      );
+      setEditId(null);
+      setEditText("");
+    } catch {
+      setError("⚠️ Failed to update task");
     }
     setLoading(false);
   };
@@ -60,9 +95,9 @@ export default function TodoApp() {
 
   return (
     <div style={{ display: "flex", fontFamily: "Arial", padding: 20 }}>
-      {/* Основной контент */}
+      {/* Основной блок */}
       <div style={{ flex: 1, maxWidth: 600 }}>
-        <h2>ToDo App</h2>
+        <h2>ToDo App (Connected to API)</h2>
 
         {error && <div style={{ color: "red" }}>{error}</div>}
 
@@ -81,17 +116,54 @@ export default function TodoApp() {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <ul style={{ marginTop: 20 }}>
+          <ul style={{ marginTop: 20, padding: 0, listStyle: "none" }}>
             {filteredTasks.map((task) => (
-              <li key={task.id} style={{ padding: "6px 0" }}>
-                {task.title}
+              <li key={task.id} style={{ marginBottom: 10 }}>
+                {editId === task.id ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") updateTask();
+                      }}
+                      style={{ padding: "4px", width: "60%" }}
+                    />
+                    <button onClick={updateTask} style={{ marginLeft: 8 }}>
+                      ✅
+                    </button>
+                    <button
+                      onClick={() => setEditId(null)}
+                      style={{ marginLeft: 4 }}
+                    >
+                      ❌
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span>{task.title}</span>
+                    <button
+                      onClick={() => startEdit(task)}
+                      style={{ marginLeft: 8 }}
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => deleteTask(task.id)}
+                      style={{ marginLeft: 4 }}
+                    >
+                      🗑
+                    </button>
+                  </>
+                )}
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      {/* Правое меню */}
+      {/* Боковое меню */}
       <div style={{ width: 180, paddingLeft: 40 }}>
         <h4>Filters</h4>
         <div
