@@ -89,7 +89,7 @@ export default function TodoApp() {
       const today = new Date().toISOString().split("T")[0];
       return task.created_at?.startsWith(today);
     }
-    if (filter === "high") return task.priority === "high";
+    if (["high", "medium", "low"].includes(filter)) return task.priority === filter;
     return true;
   });
 
@@ -99,11 +99,10 @@ export default function TodoApp() {
         display: "flex",
         justifyContent: "flex-end",
         alignItems: "flex-start",
-        padding: "80px 60px 40px 60px", // сдвиг вниз и вправо
+        padding: "80px 60px 40px 60px",
         fontFamily: "Arial",
       }}
     >
-      {/* Основной блок */}
       <div style={{ width: "100%", maxWidth: 600 }}>
         <h2 style={{ textAlign: "center" }}>ToDo App (Connected to API)</h2>
 
@@ -148,14 +147,22 @@ export default function TodoApp() {
                       }}
                       style={{ padding: "4px", flex: 1 }}
                     />
-                    <button onClick={updateTask} style={{ marginLeft: 8 }}>✅</button>
-                    <button onClick={() => setEditId(null)} style={{ marginLeft: 4 }}>❌</button>
+                    <button onClick={updateTask} style={{ marginLeft: 8 }}>
+                      ✅
+                    </button>
+                    <button onClick={() => setEditId(null)} style={{ marginLeft: 4 }}>
+                      ❌
+                    </button>
                   </>
                 ) : (
                   <>
                     <span style={{ flex: 1 }}>{task.title}</span>
-                    <button onClick={() => startEdit(task)} style={{ marginLeft: 8 }}>✏️</button>
-                    <button onClick={() => deleteTask(task.id)} style={{ marginLeft: 4 }}>🗑</button>
+                    <button onClick={() => startEdit(task)} style={{ marginLeft: 8 }}>
+                      ✏️
+                    </button>
+                    <button onClick={() => deleteTask(task.id)} style={{ marginLeft: 4 }}>
+                      🗑
+                    </button>
                   </>
                 )}
               </li>
@@ -164,7 +171,6 @@ export default function TodoApp() {
         )}
       </div>
 
-      {/* Меню справа */}
       <div
         style={{
           width: 180,
@@ -173,17 +179,41 @@ export default function TodoApp() {
         }}
       >
         <h4 style={{ marginBottom: 16 }}>Filters</h4>
-        <div onClick={() => setFilter("all")} style={{ cursor: "pointer", marginBottom: 10 }}>
+        <div
+          onClick={() => setFilter("all")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
           🔹 All
         </div>
-        <div onClick={() => setFilter("today")} style={{ cursor: "pointer", marginBottom: 10 }}>
+        <div
+          onClick={() => setFilter("today")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
           📅 Today
         </div>
-        <div onClick={() => setFilter("completed")} style={{ cursor: "pointer", marginBottom: 10 }}>
+        <div
+          onClick={() => setFilter("completed")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
           ✅ Completed
         </div>
-        <div onClick={() => setFilter("high")} style={{ cursor: "pointer", marginBottom: 10 }}>
+        <div
+          onClick={() => setFilter("high")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
           🔥 High Priority
+        </div>
+        <div
+          onClick={() => setFilter("medium")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
+          ⚡ Medium Priority
+        </div>
+        <div
+          onClick={() => setFilter("low")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
+          🐢 Low Priority
         </div>
       </div>
     </div>
