@@ -94,13 +94,15 @@ export default function TodoApp() {
   });
 
   return (
-    <div style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "flex-start",
-      padding: "40px 20px",
-      fontFamily: "Arial"
-    }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        alignItems: "flex-start",
+        padding: "80px 60px 40px 60px", // сдвиг вниз и вправо
+        fontFamily: "Arial",
+      }}
+    >
       {/* Основной блок */}
       <div style={{ width: "100%", maxWidth: 600 }}>
         <h2 style={{ textAlign: "center" }}>ToDo App (Connected to API)</h2>
@@ -126,12 +128,15 @@ export default function TodoApp() {
         ) : (
           <ul style={{ listStyle: "none", padding: 0 }}>
             {filteredTasks.map((task) => (
-              <li key={task.id} style={{
-                marginBottom: 10,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}>
+              <li
+                key={task.id}
+                style={{
+                  marginBottom: 10,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 {editId === task.id ? (
                   <>
                     <input
@@ -160,11 +165,13 @@ export default function TodoApp() {
       </div>
 
       {/* Меню справа */}
-      <div style={{
-        width: 180,
-        marginLeft: 40,
-        padding: "10px 0"
-      }}>
+      <div
+        style={{
+          width: 180,
+          marginLeft: 40,
+          padding: "10px 0",
+        }}
+      >
         <h4 style={{ marginBottom: 16 }}>Filters</h4>
         <div onClick={() => setFilter("all")} style={{ cursor: "pointer", marginBottom: 10 }}>
           🔹 All
