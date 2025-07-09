@@ -9,22 +9,15 @@ export default function TodoApp() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
 
-  // Получение задач с API
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
   const fetchTasks = async () => {
     setLoading(true);
     setError(null);
     try {
-      let url = `${API_BASE_URL}/tasks`;
-
-      if (filter === "today") {
-        url += `?filter=today`;
-      } else if (filter === "completed") {
-        url += `?filter=completed`;
-      } else if (["high", "medium", "low"].includes(filter)) {
-        url += `?priority=${filter}`;
-      }
-
-      const res = await fetch(url);
+      const res = await fetch(`${API_BASE_URL}/tasks`);
       const data = await res.json();
       setTasks(data);
     } catch (err) {
@@ -33,11 +26,6 @@ export default function TodoApp() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, [filter]);
-
-  // Добавление задачи
   const addTask = async () => {
     if (!input.trim()) return;
     setLoading(true);
@@ -48,6 +36,9 @@ export default function TodoApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: input.trim() }),
       });
+
+      if (!res.ok) throw new Error();
+
       const newTask = await res.json();
       setTasks((prev) => [...prev, newTask]);
       setInput("");
@@ -57,53 +48,77 @@ export default function TodoApp() {
     setLoading(false);
   };
 
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "completed") return task.completed;
+    if (filter === "today") {
+      const today = new Date().toISOString().split("T")[0];
+      return task.created_at?.startsWith(today);
+    }
+    if (filter === "high") return task.priority === "high";
+    return true;
+  });
+
   return (
-    <div style={{ maxWidth: 400, margin: "40px auto", fontFamily: "Arial" }}>
-      <h2>ToDo App (with Filters)</h2>
+    <div style={{ display: "flex", fontFamily: "Arial", padding: 20 }}>
+      {/* Основной контент */}
+      <div style={{ flex: 1, maxWidth: 600 }}>
+        <h2>ToDo App</h2>
 
-      {error && <div style={{ color: "red" }}>{error}</div>}
+        {error && <div style={{ color: "red" }}>{error}</div>}
 
-      <input
-        type="text"
-        placeholder="Enter task"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        style={{ padding: "8px", width: "70%", marginRight: "10px" }}
-        disabled={loading}
-      />
-      <button onClick={addTask} disabled={loading} style={{ padding: "8px 16px" }}>
-        Add
-      </button>
+        <input
+          type="text"
+          placeholder="Enter task"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          disabled={loading}
+          style={{ padding: "8px", width: "65%", marginRight: "10px" }}
+        />
+        <button onClick={addTask} disabled={loading} style={{ padding: "8px" }}>
+          Add
+        </button>
 
-      <select
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        style={{ marginTop: "20px", padding: "8px", width: "100%" }}
-      >
-        <option value="all">All Tasks</option>
-        <option value="today">Today</option>
-        <option value="completed">Completed</option>
-        <option value="high">High Priority</option>
-        <option value="medium">Medium Priority</option>
-        <option value="low">Low Priority</option>
-      </select>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <ul style={{ marginTop: 20 }}>
+            {filteredTasks.map((task) => (
+              <li key={task.id} style={{ padding: "6px 0" }}>
+                {task.title}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <ul style={{ marginTop: 20 }}>
-          {tasks.map((task) => (
-            <li key={task.id} style={{ padding: "6px 0" }}>
-              {task.title}
-              {task.priority && (
-                <span style={{ marginLeft: 8, fontSize: 12, color: "#999" }}>
-                  [{task.priority}]
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+      {/* Правое меню */}
+      <div style={{ width: 180, paddingLeft: 40 }}>
+        <h4>Filters</h4>
+        <div
+          onClick={() => setFilter("all")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
+          🔹 All
+        </div>
+        <div
+          onClick={() => setFilter("today")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
+          📅 Today
+        </div>
+        <div
+          onClick={() => setFilter("completed")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
+          ✅ Completed
+        </div>
+        <div
+          onClick={() => setFilter("high")}
+          style={{ cursor: "pointer", marginBottom: 10 }}
+        >
+          🔥 High Priority
+        </div>
+      </div>
     </div>
   );
 }
