@@ -97,9 +97,8 @@ export default function TodoApp() {
     <div
       style={{
         display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "flex-start",
-        padding: "80px 60px 40px 60px",
+        justifyContent: "center",
+        padding: "80px 60px 60px 60px",
         fontFamily: "Arial",
       }}
     >
@@ -175,7 +174,7 @@ export default function TodoApp() {
         style={{
           width: 180,
           marginLeft: 40,
-          padding: "10px 0",
+          paddingTop: 20,
         }}
       >
         <h4 style={{ marginBottom: 16 }}>Filters</h4>
