@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/umet/static/css/main.e6c13ad2.css",
-    "main.js": "/umet/static/js/main.edad2034.js",
+    "main.js": "/umet/static/js/main.6cbbf291.js",
     "static/js/453.457ca12a.chunk.js": "/umet/static/js/453.457ca12a.chunk.js",
     "index.html": "/umet/index.html",
     "main.e6c13ad2.css.map": "/umet/static/css/main.e6c13ad2.css.map",
-    "main.edad2034.js.map": "/umet/static/js/main.edad2034.js.map",
+    "main.6cbbf291.js.map": "/umet/static/js/main.6cbbf291.js.map",
     "453.457ca12a.chunk.js.map": "/umet/static/js/453.457ca12a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.edad2034.js"
+    "static/js/main.6cbbf291.js"
   ]
 }
