@@ -159,7 +159,19 @@ export default function TodoApp() {
                     <button onClick={() => startEdit(task)} style={{ marginLeft: 8 }}>
                       ✏️
                     </button>
-                    <button onClick={() => deleteTask(task.id)} style={{ marginLeft: 4 }}>
+                    <button
+                      onClick={() => {
+                        if (tasks[0] && task.id === tasks[0].id) return; // первый таск нельзя удалить
+                        deleteTask(task.id);
+                      }}
+                      style={{
+                        marginLeft: 4,
+                        opacity: tasks[0] && task.id === tasks[0].id ? 0.5 : 1,
+                        cursor:
+                          tasks[0] && task.id === tasks[0].id ? "not-allowed" : "pointer",
+                      }}
+                      disabled={tasks[0] && task.id === tasks[0].id}
+                    >
                       🗑
                     </button>
                   </>
