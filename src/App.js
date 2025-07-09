@@ -94,31 +94,44 @@ export default function TodoApp() {
   });
 
   return (
-    <div style={{ display: "flex", fontFamily: "Arial", padding: 20 }}>
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "flex-start",
+      padding: "40px 20px",
+      fontFamily: "Arial"
+    }}>
       {/* Основной блок */}
-      <div style={{ flex: 1, maxWidth: 600 }}>
-        <h2>ToDo App (Connected to API)</h2>
+      <div style={{ width: "100%", maxWidth: 600 }}>
+        <h2 style={{ textAlign: "center" }}>ToDo App (Connected to API)</h2>
 
-        {error && <div style={{ color: "red" }}>{error}</div>}
+        {error && <div style={{ color: "red", textAlign: "center" }}>{error}</div>}
 
-        <input
-          type="text"
-          placeholder="Enter task"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          disabled={loading}
-          style={{ padding: "8px", width: "65%", marginRight: "10px" }}
-        />
-        <button onClick={addTask} disabled={loading} style={{ padding: "8px" }}>
-          Add
-        </button>
+        <div style={{ display: "flex", marginBottom: 20 }}>
+          <input
+            type="text"
+            placeholder="Enter task"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            disabled={loading}
+            style={{ padding: "8px", flex: 1, marginRight: "10px" }}
+          />
+          <button onClick={addTask} disabled={loading} style={{ padding: "8px 16px" }}>
+            Add
+          </button>
+        </div>
 
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <ul style={{ marginTop: 20, padding: 0, listStyle: "none" }}>
+          <ul style={{ listStyle: "none", padding: 0 }}>
             {filteredTasks.map((task) => (
-              <li key={task.id} style={{ marginBottom: 10 }}>
+              <li key={task.id} style={{
+                marginBottom: 10,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}>
                 {editId === task.id ? (
                   <>
                     <input
@@ -128,33 +141,16 @@ export default function TodoApp() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") updateTask();
                       }}
-                      style={{ padding: "4px", width: "60%" }}
+                      style={{ padding: "4px", flex: 1 }}
                     />
-                    <button onClick={updateTask} style={{ marginLeft: 8 }}>
-                      ✅
-                    </button>
-                    <button
-                      onClick={() => setEditId(null)}
-                      style={{ marginLeft: 4 }}
-                    >
-                      ❌
-                    </button>
+                    <button onClick={updateTask} style={{ marginLeft: 8 }}>✅</button>
+                    <button onClick={() => setEditId(null)} style={{ marginLeft: 4 }}>❌</button>
                   </>
                 ) : (
                   <>
-                    <span>{task.title}</span>
-                    <button
-                      onClick={() => startEdit(task)}
-                      style={{ marginLeft: 8 }}
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => deleteTask(task.id)}
-                      style={{ marginLeft: 4 }}
-                    >
-                      🗑
-                    </button>
+                    <span style={{ flex: 1 }}>{task.title}</span>
+                    <button onClick={() => startEdit(task)} style={{ marginLeft: 8 }}>✏️</button>
+                    <button onClick={() => deleteTask(task.id)} style={{ marginLeft: 4 }}>🗑</button>
                   </>
                 )}
               </li>
@@ -163,31 +159,23 @@ export default function TodoApp() {
         )}
       </div>
 
-      {/* Боковое меню */}
-      <div style={{ width: 180, paddingLeft: 40 }}>
-        <h4>Filters</h4>
-        <div
-          onClick={() => setFilter("all")}
-          style={{ cursor: "pointer", marginBottom: 10 }}
-        >
+      {/* Меню справа */}
+      <div style={{
+        width: 180,
+        marginLeft: 40,
+        padding: "10px 0"
+      }}>
+        <h4 style={{ marginBottom: 16 }}>Filters</h4>
+        <div onClick={() => setFilter("all")} style={{ cursor: "pointer", marginBottom: 10 }}>
           🔹 All
         </div>
-        <div
-          onClick={() => setFilter("today")}
-          style={{ cursor: "pointer", marginBottom: 10 }}
-        >
+        <div onClick={() => setFilter("today")} style={{ cursor: "pointer", marginBottom: 10 }}>
           📅 Today
         </div>
-        <div
-          onClick={() => setFilter("completed")}
-          style={{ cursor: "pointer", marginBottom: 10 }}
-        >
+        <div onClick={() => setFilter("completed")} style={{ cursor: "pointer", marginBottom: 10 }}>
           ✅ Completed
         </div>
-        <div
-          onClick={() => setFilter("high")}
-          style={{ cursor: "pointer", marginBottom: 10 }}
-        >
+        <div onClick={() => setFilter("high")} style={{ cursor: "pointer", marginBottom: 10 }}>
           🔥 High Priority
         </div>
       </div>
