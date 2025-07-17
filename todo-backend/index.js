@@ -21,7 +21,7 @@ const pool = new Pool({
 });
 
 // === TASK ROUTES ===
-
+//test
 // Получить все таски
 app.get('/tasks', async (req, res) => {
   try {
