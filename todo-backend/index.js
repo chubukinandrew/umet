@@ -4,7 +4,8 @@ console.log('Server PORT:', process.env.PORT);
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-require('dotenv').config(); // если используешь локально .env
+const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,11 +14,13 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // переменная окружения с твоей строкой подключения
+  connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // для хостингов типа Render, Heroku, Railway
+    rejectUnauthorized: false,
   },
 });
+
+// === TASK ROUTES ===
 
 // Получить все таски
 app.get('/tasks', async (req, res) => {
@@ -84,6 +87,35 @@ app.patch('/tasks/:id', async (req, res) => {
     res.json({ message: 'Task updated', task: result.rows[0] });
   } catch (err) {
     console.error('Error updating task:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// === USER REGISTRATION ===
+
+app.post('/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (userExists.rows.length > 0) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email, created_at',
+      [username, email, hashedPassword]
+    );
+
+    res.status(201).json({ message: 'User registered', user: result.rows[0] });
+  } catch (err) {
+    console.error('Error registering user:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
