@@ -21,7 +21,7 @@ const pool = new Pool({
 });
 
 // === TASK ROUTES ===
-//test
+
 // Получить все таски
 app.get('/tasks', async (req, res) => {
   try {
@@ -92,7 +92,6 @@ app.patch('/tasks/:id', async (req, res) => {
 });
 
 // === USER REGISTRATION ===
-
 app.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -116,6 +115,42 @@ app.post('/register', async (req, res) => {
     res.status(201).json({ message: 'User registered', user: result.rows[0] });
   } catch (err) {
     console.error('Error registering user:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// === USER LOGIN ===
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return res.status(400).json({ error: 'Invalid password' });
+    }
+
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        created_at: user.created_at,
+      },
+    });
+  } catch (err) {
+    console.error('Error during login:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
