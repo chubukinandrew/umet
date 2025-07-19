@@ -3,6 +3,7 @@ import React, { useState } from "react";
 const API_BASE_URL = "https://umet.onrender.com";
 
 export default function RegisterPage({ onRegisterSuccess }) {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -20,7 +21,7 @@ export default function RegisterPage({ onRegisterSuccess }) {
       const res = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, email, password }),
       });
       if (!res.ok) throw new Error("Ошибка регистрации");
       const data = await res.json();
@@ -34,7 +35,16 @@ export default function RegisterPage({ onRegisterSuccess }) {
   return (
     <div style={{ maxWidth: 400, margin: "auto", padding: 20 }}>
       <h2>Регистрация</h2>
-      {error && <div style={{ color: "red" }}>{error}</div>}
+      {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
+
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        disabled={loading}
+        style={{ width: "100%", padding: 8, marginBottom: 12 }}
+      />
 
       <input
         type="email"
